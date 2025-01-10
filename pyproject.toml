@@ -1,0 +1,48 @@
+[project]
+name = "cetautomatix"
+version = "0.1.0"
+description = "Small project to help filling 'CERFA' forms"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.32.3",
+]
+
+[project.optional-dependencies]
+app = [
+    "fastapi[standard]>=0.115.6",
+    "httpx>=0.28.1",
+    "langchain-openai>=0.2.14",
+    "openai>=1.59.3",
+    "pydantic>=2.10.4",
+    "pydantic-settings>=2.7.1",
+]
+ui = [
+    "python-dotenv>=1.0.1",
+    "streamlit>=1.41.1",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.8.6",
+]
+test = [
+    "pytest>=8.3.4",
+]
+
+[tool.setuptools]
+py-modules = []
+
+[tool.ruff]
+line-length = 150
+
+[tool.ruff.lint]
+ignore = ["F403", "F841"] # import * and never used variables
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+known-first-party = ["config", "utils", "app"]
+forced-separate = ["tests"]
+
+[tool.ruff.lint.isort.sections]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
