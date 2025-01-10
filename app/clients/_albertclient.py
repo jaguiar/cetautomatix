@@ -12,12 +12,7 @@ class AlbertClient(GenericAsyncHttpClient):
         self.openAI_client = OpenAI(base_url=self.base_url, api_key=settings.api_key.get_secret_value())
         self.httpx_client = httpx_client
         self.language_model = settings.language_model
-        self._last_chunks: list[dict] = []  # stores last sources used by a RAG generation.
 
-    @property
-    def last_chunks(self) -> list[dict]:
-        return self._last_chunks
-    
     async def fetch_available_models(self) -> dict:
         """ Call the GET /models endpoint of the Albert API to get available models """
         response = await GenericAsyncHttpClient.get(self,"/models", timeout=None )
@@ -35,7 +30,10 @@ class AlbertClient(GenericAsyncHttpClient):
         return collections_by_id
 
     async def ask_for_document_summary(self, document_url: str, collections_to_use: list[str]) -> dict:
-        """Call the GET /completions endpoint of the Albert API"""
+        """
+            Use AlbertAPI to ask for a summary of a document
+            We should be able to somehow specify which collections to use when it will be functional 
+        """
         logger.debug(f"Ask for document summary with document url: {document_url}")
         doc_summary_user_message=f"""Salut Albert, je suis Cétautomatix, j'aimerais que tu me résumes le document suivant: {document_url}"""
         messages = [{"role": "user", "content": f"{doc_summary_user_message}"}]
@@ -44,8 +42,12 @@ class AlbertClient(GenericAsyncHttpClient):
         logger.debug(f"End asking, answer: {answer}")
         return answer
     
-    #### utils generic methods
+    #### utils methods
     async def ask(self, messages: list[dict], collections: list[str], **other_params) -> str:
+        """ 
+        Call the POST /chat/completions endpoint of the Albert API to chat with Albert 
+        see collab: https://colab.research.google.com/github/etalab-ia/albert-api/blob/main/docs/tutorials/retrieval_augmented_generation.ipynb#scrollTo=e2e1368a
+        """
         response = await GenericAsyncHttpClient.post(
             self, 
             "/chat/completions", 
@@ -61,6 +63,10 @@ class AlbertClient(GenericAsyncHttpClient):
         return answer
 
     def ask2(self, messages: list[dict], collections: list[str], **other_params) -> str:
+        """ 
+            Same than the previous one but with openAI client, so you have to be sync and you can't use the search part ?!
+            see collab: https://colab.research.google.com/github/etalab-ia/albert-api/blob/main/docs/tutorials/chat_completions.ipynb#scrollTo=3f700cab-e53f-4a4c-8cbc-be9bdf96a7d7
+        """
         result = self.openAI_client.chat.completions.create(
             model=self.language_model, 
             messages=messages,
