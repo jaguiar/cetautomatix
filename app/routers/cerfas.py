@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+
 # from app.config.lifespan import clients
 router = APIRouter(
     prefix="/cerfas",
@@ -6,8 +7,9 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+
 @router.get("/")
 async def get_cerfa_of_interest_from_albert():
-    #c = await clients.albert.fetch_collections()
-    #return {"cerfas": c}
+    # c = await clients.albert.fetch_collections()
+    # return {"cerfas": c}
     raise HTTPException(status_code=404, detail="Not implemented yet")

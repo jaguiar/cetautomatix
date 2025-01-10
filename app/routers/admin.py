@@ -9,9 +9,11 @@ router = APIRouter(
     responses={401: {"description": "Unauthorized"}, 403: {"description": "Forbidden"}, 404: {"description": "Not found"}},
 )
 
+
 @router.get("/settings")
 async def read_settings():
     return settings
+
 
 @router.get("/clients")
 async def read_clients():

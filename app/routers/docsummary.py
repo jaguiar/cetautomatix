@@ -8,6 +8,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+
 @router.post("/")
 async def sum_up_document(body: DocumentSummaryRequest):
     """

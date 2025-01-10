@@ -7,6 +7,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+
 @router.get("/")
 async def read_albert_available_models():
     models = await clients.albert.fetch_available_models()
