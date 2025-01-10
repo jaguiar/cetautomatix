@@ -3,6 +3,9 @@ from components.sidebar import sidebar
 import requests
 import os
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 st.set_page_config(page_title="Cétautomatix", page_icon="🤖", layout="wide")
@@ -40,6 +43,7 @@ user_choice = st.radio(
 # submit = st.button("Valider", key="submit", on_click=set_stage, args=(1,))
 # if st.session_state["stage"] == 1:
 backend_url = os.environ.get("BACKEND_URL", "http://localhost:8000")
+debug_st = os.environ.get("DEBUG_ST", False)
 if user_choice == "1. lister les collections d'Albert disponibles":
     response = requests.get(f"{backend_url}/collections")
     c = response.json()["collections"]
@@ -64,16 +68,31 @@ elif user_choice == "3. Obtenir un résumé sur un document en particulier":
             format_func=lambda x: collections.get(x).get("name"),
             key="collections_to_use",
         )
+        topic_of_interest = st.text_input(
+            "Sujet particulier du document à mettre en lumière",
+            value="",
+            help="Vous pouvez ajouter un sujet particulier du document sur lequel Albert devrait se concentrer",
+            key="topic_of_interest",
+        )
         ask_for_document_summary_button = st.form_submit_button(
             "Valider",
             # on_click=set_stage, args=(2,)
         )
         if ask_for_document_summary_button:
-            data = {"document_url": document_url, "collections_to_use": collections_to_use}
-            st.write(data)
+            data = {
+                "document_url": document_url,
+                "collections_to_use": collections_to_use,
+                "topic_of_interest": topic_of_interest,
+            }
+            if debug_st:
+                with st.expander("See request"):
+                    st.write("Request:")
+                    st.write(data)
             response = requests.post(
                 url=f"{backend_url}/summary/",
                 data=json.dumps(data),
                 headers={"Content-Type": "application/json"},
             )
-            st.write(response.json())
+            with st.container():
+                st.write("Response:")
+                st.write(response.json())
