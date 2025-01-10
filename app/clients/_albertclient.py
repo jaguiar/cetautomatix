@@ -46,7 +46,7 @@ class AlbertClient(GenericAsyncHttpClient):
         return answer
 
     #### utils methods
-    async def ask(self, messages: list[dict], collections: list[str], **other_params) -> str:
+    async def ask(self, messages: list[dict], collections: list[str], **other_params) -> str: # FIXME return a more structured answer with separated source and content
         """
         Call the POST /chat/completions endpoint of the Albert API to chat with Albert
         see collab: https://colab.research.google.com/github/etalab-ia/albert-api/blob/main/docs/tutorials/retrieval_augmented_generation.ipynb#scrollTo=e2e1368a
@@ -63,7 +63,11 @@ class AlbertClient(GenericAsyncHttpClient):
                 "search_args": {"collections": [], "k": 6, "method": "semantic"},
             },
         )
-        answer = response.json().choices[0].message.content
+        response = response.json()
+        logger.debug(f"Gotresponse: {response}")
+        content = response["choices"][0]["message"]["content"]
+        sources = [result["chunk"]["content"] for result in response['search_results']]
+        answer = f"{content} \n - Sources: {sources}"
         return answer
 
     def ask2(self, messages: list[dict], collections: list[str], **other_params) -> str:
