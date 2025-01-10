@@ -58,6 +58,16 @@ elif user_choice == "2. Obtenir de l'aide pour remplir un CERFA (WIP)":
         ],
         key="cerfa_choice",
     )
+    st.write("""A venir... 
+        L'idée (trop ambitieuse) était au départ d'utiliser Albert pour trouver le "bon" CERFA à partir d'une série d'informations 
+        et de lui demander son aide pour remplir les champs du CERFA en croisant les données publiques + celles entréees par l'utilisateur.
+        Par exemple :
+        1. que voulez-vous faire ? (choix : 1. Déclarer mes taxes en tant qu'entreprise 2...)
+        2. si choix 1 => "Albert de quelles informations as-tu besoin pour me trouver le CERFA qui convient pour déclarer des taxes en tant qu'entreprise ?"
+            Réponse (de mémoire : "Type d'entreprise, secteur d'activité, taxes à déclarer, période etc.")
+        3. Affichez les champs pour que l'utilsateur les remplisse et soumission
+            => Albert donne le CERFA et lui demander de l'aide pour le remplir, ensuite, il répond généralement qu'il a besoin d'informations supplémentaires dont certaines sont public (annuaire des entreprises)
+        """)
 elif user_choice == "3. Obtenir un résumé sur un document en particulier":
     with st.form("summary_form"):
         document_url = st.text_input("Entrez l'url du document à résumer", value="")
