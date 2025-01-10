@@ -3,6 +3,8 @@ from httpx import AsyncClient
 from app.config.settings import AlbertApiSettings
 from ._genericasynhttpclient import GenericAsyncHttpClient, BearerAuth
 from app.config.logging import logger
+from app.clients.prompts._templates import DocumentSummaryUserMessage
+from typing import Optional
 
 
 class AlbertClient(GenericAsyncHttpClient):
@@ -32,21 +34,23 @@ class AlbertClient(GenericAsyncHttpClient):
         collections_by_id = {v["id"]: v for v in data["data"]}
         return collections_by_id
 
-    async def ask_for_document_summary(self, document_url: str, collections_to_use: list[str]) -> dict:
+    async def ask_for_document_summary(self, document_url: str, collections_to_use: list[str], topic_of_interest: Optional[str]) -> dict:
         """
         Use AlbertAPI to ask for a summary of a document
         We should be able to somehow specify which collections to use when it will be functional
+        And we could also specify a topic of interest Albert should focus on
         """
-        logger.debug(f"Ask for document summary with document url: {document_url}")
-        doc_summary_user_message = f"""Salut Albert, je suis Cétautomatix, j'aimerais que tu me résumes le document suivant: {document_url}"""
-        messages = [{"role": "user", "content": f"{doc_summary_user_message}"}]
+        logger.debug(f"Ask for document summary with document url: {document_url} and collections: {collections_to_use}")
+        messages = DocumentSummaryUserMessage(document_url=document_url, topic_of_interest=topic_of_interest).as_prompt()
         logger.debug(f" and messages: {messages}")
         answer = await self.ask(messages=messages, collections=collections_to_use)
         logger.debug(f"End asking, answer: {answer}")
         return answer
 
     #### utils methods
-    async def ask(self, messages: list[dict], collections: list[str], **other_params) -> str: # FIXME return a more structured answer with separated source and content
+    async def ask(
+        self, messages: list[dict], collections: list[str], **other_params
+    ) -> str:  # FIXME return a more structured answer with separated source and content
         """
         Call the POST /chat/completions endpoint of the Albert API to chat with Albert
         see collab: https://colab.research.google.com/github/etalab-ia/albert-api/blob/main/docs/tutorials/retrieval_augmented_generation.ipynb#scrollTo=e2e1368a
@@ -60,13 +64,15 @@ class AlbertClient(GenericAsyncHttpClient):
                 "stream": False,
                 "n": 1,
                 "search": True,
+                # "search_args": {"collections": collections, "k": 6, "method": "semantic"}, # using the collections list results in HTTP 504 and timeout
                 "search_args": {"collections": [], "k": 6, "method": "semantic"},
             },
+            timeout=None,
         )
         response = response.json()
         logger.debug(f"Gotresponse: {response}")
         content = response["choices"][0]["message"]["content"]
-        sources = [result["chunk"]["content"] for result in response['search_results']]
+        sources = [result["chunk"]["content"] for result in response["search_results"]]
         answer = f"{content} \n - Sources: {sources}"
         return answer
 
