@@ -4,7 +4,7 @@ from app.config.lifespan import clients
 router = APIRouter(
     prefix="/collections",
     tags=["collections"],
-    responses={404: {"description": "Not found"}},
+    responses={500: {"description": "Internal server error"}},
 )
 
 
