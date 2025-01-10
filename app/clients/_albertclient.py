@@ -44,14 +44,6 @@ class AlbertClient(GenericAsyncHttpClient):
         logger.debug(f"End asking, answer: {answer}")
         return answer
     
-    def fetch_documents(self, collection_id: str) -> list[dict]:
-        """Call the /documents endpoint of the Albert API"""
-        url = self.base_url
-        headers = {"Authorization": f"Bearer {self.api_key}"}
-        response = requests.get(f"{url}/documents/{collection_id}", headers=headers)
-        log_and_raise_for_status(response)
-        return response.json()['data']
-    
     #### utils generic methods
     async def ask(self, messages: list[dict], collections: list[str], **other_params) -> str:
         response = await GenericAsyncHttpClient.post(
