@@ -2,7 +2,7 @@ import streamlit as st
 from components.sidebar import sidebar
 import requests
 import os
-import pandas as pd 
+import json
 
 
 st.set_page_config(page_title="Cétautomatix", page_icon="🤖", layout="wide")

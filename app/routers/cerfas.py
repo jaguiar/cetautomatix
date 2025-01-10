@@ -1,6 +1,5 @@
-from fastapi import APIRouter
-from app.config.lifespan import clients
-
+from fastapi import APIRouter, HTTPException
+# from app.config.lifespan import clients
 router = APIRouter(
     prefix="/cerfas",
     tags=["cerfas"],
